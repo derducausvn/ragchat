@@ -21,14 +21,20 @@ from loader import load_all_documents
 
 def prepare_corpus(folder_path):
     documents = load_all_documents(folder_path)
+    
     if not documents:
         print("[INFO] No documents loaded. Using fallback message.")
-        return "No documents were loaded. Add files to the 'data' folder to begin indexing."
+        return ["No knowledge provided yet."], [("none", 0)]
 
-    full_text = ""
+    corpus = []
+    metadata = []
+
     for filename, text in documents:
-        full_text += f"\n--- {filename} ---\n{text}\n"
-    return full_text
+        chunks = chunk_text(text)
+        corpus.extend(chunks)
+        metadata.extend([(filename, i) for i in range(len(chunks))])
+
+    return corpus, metadata
 
 # === Step 2: Embed Chunks ===
 def embed_texts(texts):
