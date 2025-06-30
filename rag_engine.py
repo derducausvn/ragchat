@@ -17,17 +17,18 @@ def chunk_text(text, chunk_size=CHUNK_SIZE):
     return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size)]
 
 # === Step 1: Load and Chunk Documents ===
-def prepare_corpus(data_folder):
-    raw_docs = load_all_documents(data_folder)
-    corpus = []
-    metadata = []
+from loader import load_all_documents
 
-    for filename, content in raw_docs:
-        chunks = chunk_text(content)
-        corpus.extend(chunks)
-        metadata.extend([(filename, i) for i in range(len(chunks))])
-    
-    return corpus, metadata
+def prepare_corpus(folder_path):
+    documents = load_all_documents(folder_path)
+    if not documents:
+        print("[INFO] No documents loaded. Using fallback message.")
+        return "No documents were loaded. Add files to the 'data' folder to begin indexing."
+
+    full_text = ""
+    for filename, text in documents:
+        full_text += f"\n--- {filename} ---\n{text}\n"
+    return full_text
 
 # === Step 2: Embed Chunks ===
 def embed_texts(texts):
